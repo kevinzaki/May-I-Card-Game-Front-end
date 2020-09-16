@@ -1,25 +1,19 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { StyleSheet, View, Text, Dimensions } from "react-native";
 import SideBoard from "./SideBoard";
 import socket from "../../util/socketConnection";
 import MyCards from "./MyCards";
 import DeckArea from "./DeckArea";
 import MeldArea from "./MeldArea";
-// import { MeldsContext } from "../contexts/MeldsContext";
+import { DimensionsContext } from "../contexts/DimensionsContext";
 
 function GameBoard() {
-  const [opponentCards, setOpponentCards] = useState([]);
-  const [opponentOneCardCount, SetOpponentOneCardCount] = useState(11);
-  const [opponentTwoCardCount, SetOpponentTwoCardCount] = useState(11);
-  const [meldArea, setMeldArea] = useState({ x: [0, 0], y: [0, 0] });
-  const [heightOffset, setHeightOffset] = useState(0);
+  const [opponents, setOponnents] = useState([]);
+  const { setMeldAreaHeightOffset } = useContext(DimensionsContext);
 
   useEffect(() => {
     socket.on("getOtherPlayers", data => {
-      setOpponentCards(data);
-      SetOpponentOneCardCount(data[0].cardCount);
-      SetOpponentTwoCardCount(data[1] ? data[1].cardCount : 11);
-      return () => socket.disconnect();
+      setOponnents(data);
     });
   }, []);
 
@@ -27,20 +21,20 @@ function GameBoard() {
     <>
       <View
         onLayout={e => {
-          setHeightOffset(e.nativeEvent.layout.y);
+          setMeldAreaHeightOffset(e.nativeEvent.layout.y);
         }}
         style={styles.container}
       >
-        <SideBoard players={opponentOneCardCount} />
+        <SideBoard opponents={opponents} side="left" />
         <View style={styles.centerContainer}>
           <View style={styles.meldContainer}>
-            <MeldArea heightOffset={heightOffset} />
+            <MeldArea />
           </View>
           <DeckArea />
         </View>
-        <SideBoard players={opponentTwoCardCount} />
+        <SideBoard opponents={opponents} side="right" />
       </View>
-      <MyCards meldDropArea={meldArea} />
+      <MyCards />
     </>
   );
 }

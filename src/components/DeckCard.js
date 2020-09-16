@@ -1,7 +1,8 @@
-import React, { useRef, useState, useEffect, useContext } from "react";
-import { StyleSheet, View, Text } from "react-native";
-import { MeldsContext } from "../contexts/MeldsContext";
-import { DeckContext } from "../contexts/DeckContext";
+import React, { useContext, useState, useEffect } from "react";
+import { StyleSheet, View, Text, TouchableHighlight } from "react-native";
+import { DimensionsContext } from "../contexts/DimensionsContext";
+import { RoomContext } from "../contexts/RoomContext";
+import socket from "../../util/socketConnection";
 
 const cardSymbols = {
   Clubs: 9827,
@@ -11,33 +12,28 @@ const cardSymbols = {
 };
 
 function DeckCard(props) {
-  const { newMeldDropArea } = useContext(MeldsContext);
-  const { setDeckDropArea } = useContext(DeckContext);
+  const { setDiscardAreaSize } = useContext(DimensionsContext);
+  const {
+    room,
+    user,
+    buyCard,
+    setBuyCard,
+    setUsersBuying,
+    usersBuying,
+    buyInProgress
+  } = useContext(RoomContext);
 
-  const [discardAreaSize, setDiscardAreaSize] = useState({
-    x: 0,
-    y: 0,
-    height: 0,
-    width: 0
-  });
-  const [discardAreaDimensions, setDiscardAreaDimensions] = useState({
-    x: [0, 0],
-    y: [0, 0]
-  });
+  function _onLongPressButton() {
+    if (buyInProgress) {
+      setBuyCard(true);
+    }
+  }
+
   useEffect(() => {
-    setDeckDropArea({
-      x: [
-        newMeldDropArea.x[0] + discardAreaSize.x,
-        newMeldDropArea.x[0] + discardAreaSize.x + discardAreaSize.width
-      ],
-      y: [
-        newMeldDropArea.y[1] + discardAreaSize.y + 33,
-        newMeldDropArea.y[1] + discardAreaSize.y + discardAreaSize.height + 33
-      ]
-    });
-  }, [discardAreaSize, props.offset, newMeldDropArea]);
-
-  const [cardTouch, setCardTouch] = useState(false);
+    if (usersBuying.length === 3) {
+      socket.emit("startBuyProcess", { room, usersBuying });
+    }
+  }, [usersBuying]);
 
   const cardStyle =
     props.suit === "Hearts" || props.suit === "Diamonds"
@@ -45,13 +41,15 @@ function DeckCard(props) {
       : styles.blackCard;
   const symbol = String.fromCharCode(cardSymbols[props.suit]);
   return (
-    <View
-      onLayout={e => setDiscardAreaSize(e.nativeEvent.layout)}
-      style={styles.container}
-    >
-      <Text style={cardStyle}>{props.rank}</Text>
-      <Text style={cardStyle}>{symbol}</Text>
-    </View>
+    <TouchableHighlight onLongPress={_onLongPressButton} underlayColor="green">
+      <View
+        onLayout={e => setDiscardAreaSize(e.nativeEvent.layout)}
+        style={styles.container}
+      >
+        <Text style={cardStyle}>{props.rank}</Text>
+        <Text style={cardStyle}>{symbol}</Text>
+      </View>
+    </TouchableHighlight>
   );
 }
 

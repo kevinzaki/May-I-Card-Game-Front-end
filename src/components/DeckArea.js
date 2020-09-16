@@ -1,17 +1,13 @@
 import React, { useState, useEffect, useContext } from "react";
 import { View, StyleSheet } from "react-native";
 import socket from "../../util/socketConnection";
+import { DimensionsContext } from "../contexts/DimensionsContext";
 import DeckCard from "./DeckCard";
 import CardBack from "./CardBack";
 
 function DeckArea() {
+  const { setDeckAreaSize } = useContext(DimensionsContext);
   const [deckCount, setDeckCount] = useState(0);
-  const [deckAreaSize, setDeckAreaSize] = useState({
-    x: 0,
-    y: 0,
-    height: 0,
-    width: 0
-  });
   const [discardedCards, setDiscardedCards] = useState({
     rank: null,
     suit: null
@@ -26,15 +22,11 @@ function DeckArea() {
 
   return (
     <View
-      style={styles.container}
       onLayout={e => setDeckAreaSize(e.nativeEvent.layout)}
+      style={styles.container}
     >
       <CardBack orientation="vertical" />
-      <DeckCard
-        offset={deckAreaSize}
-        rank={discardedCards["rank"]}
-        suit={discardedCards["suit"]}
-      />
+      <DeckCard rank={discardedCards["rank"]} suit={discardedCards["suit"]} />
     </View>
   );
 }

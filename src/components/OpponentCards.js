@@ -1,7 +1,6 @@
 import React from "react";
 import { View, StyleSheet } from "react-native";
 import CardBack from "./CardBack";
-import CenterBoard from "./CenterBoard";
 
 function OpponentCards(props) {
   const items = [];

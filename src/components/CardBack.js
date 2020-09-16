@@ -25,7 +25,7 @@ const styles = StyleSheet.create({
     maxWidth: 100,
     minHeight: 35,
     maxHeight: 50,
-    marginBottom: -25
+    marginBottom: -20
   },
   verticalBackCard: {
     height: 127,

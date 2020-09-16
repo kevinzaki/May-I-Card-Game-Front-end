@@ -1,41 +1,28 @@
-import React, { useContext, useEffect, useState } from "react";
-import { View, Text, StyleSheet, Dimensions, Button } from "react-native";
+import React, { useContext, useEffect } from "react";
+import { View, StyleSheet, Button } from "react-native";
 import { MeldsContext } from "../contexts/MeldsContext";
+import { DimensionsContext } from "../contexts/DimensionsContext";
+import { RoomContext } from "../contexts/RoomContext";
 import Meld from "./Meld";
-import Card from "./Card";
+import MeldCard from "./MeldCard";
+import socket from "../../util/socketConnection";
 
 function MeldArea(props) {
+  const { turn, user } = useContext(RoomContext);
   const {
     melds,
-    setNewMeldDropArea,
-    newMeldDropArea,
     createMeld,
     meldToDisplay,
-    setMeldToDisplay
+    setMeldToDisplay,
+    setMeldButton,
+    setCreateMeld
   } = useContext(MeldsContext);
-  const [meldAreaSize, setMeldAreaSize] = useState({ width: 0, height: 0 });
-  const [meldContainerHeight, setMeldContainerHeight] = useState(0);
-  const [buttonAreaHeight, setButtonAreaHeight] = useState(0);
-  //const [offset, setOffset] = useState([0, 0]);
-  //   const [newMeldDisplayID, setNewMeldDisplayID] = useState(0);
-  //const heightOffset = 0;
 
-  useEffect(() => {
-    const { width: screenWidth } = Dimensions.get("screen");
-    const { width, height } = meldAreaSize;
-    setNewMeldDropArea({
-      x: [(screenWidth - width) / 2, width + (screenWidth - width) / 2],
-      y: [
-        props.heightOffset + meldContainerHeight - height - buttonAreaHeight,
-        props.heightOffset + meldContainerHeight - buttonAreaHeight
-      ]
-    });
-    //setOffset([props.heightOffset, newMeldDropArea.x[0]]);
-  }, [meldAreaSize, props.heightOffset, meldContainerHeight, buttonAreaHeight]);
-
-  //   useEffect(() => {
-  //     console.log(newMeldDropArea);
-  //   }, [newMeldDropArea]);
+  const {
+    setMeldAreaSize,
+    setMeldContainerHeight,
+    setMeldButtonAreaHeight
+  } = useContext(DimensionsContext);
 
   return (
     <View
@@ -44,13 +31,7 @@ function MeldArea(props) {
     >
       <View style={styles.meldsArea}>
         {melds.map(({ id, cards }) => (
-          <Meld
-            key={id}
-            id={id}
-            cards={cards}
-            xOffset={newMeldDropArea.x[0]}
-            yOffset={props.heightOffset}
-          />
+          <Meld key={id} id={id} cards={cards} />
         ))}
       </View>
       <View
@@ -63,18 +44,34 @@ function MeldArea(props) {
         style={styles.meldDropZone}
       >
         {createMeld[meldToDisplay].map(({ id, rank, suit }) => (
-          <Card key={id} id={id} rank={rank} suit={suit} />
+          <MeldCard key={id} id={id} rank={rank} suit={suit} />
         ))}
       </View>
       <View
         style={styles.buttonContainer}
-        onLayout={e => setButtonAreaHeight(e.nativeEvent.layout.height)}
+        onLayout={e => setMeldButtonAreaHeight(e.nativeEvent.layout.height)}
       >
         <View style={styles.button}>
-          <Button onPress={() => console.log("pressed MELD")} title="MELD" />
+          <Button
+            onPress={() => {
+              if (user === turn) {
+                setMeldButton(true);
+                setMeldToDisplay(0);
+              } else {
+                alert("In must be your turn in order to meld.");
+              }
+            }}
+            title="MELD"
+          />
         </View>
         <View style={styles.button}>
-          <Button onPress={() => console.log("pressed CLEAR")} title="CLEAR" />
+          <Button
+            onPress={() => {
+              setCreateMeld(meldToDisplay, null);
+              setMeldToDisplay(0);
+            }}
+            title="CLEAR"
+          />
         </View>
         <View style={styles.button}>
           <Button
@@ -104,17 +101,22 @@ const styles = StyleSheet.create({
     flex: 1
   },
   meldsArea: {
-    flex: 3,
+    flex: 5,
+    justifyContent: "center",
     flexDirection: "row",
-    alignItems: "center",
-    alignSelf: "stretch",
-    flexWrap: "wrap"
+    alignSelf: "flex-start",
+    alignContent: "flex-start",
+    flexWrap: "wrap",
+    alignItems: "flex-start"
   },
   meldDropZone: {
     flex: 1,
+    paddingLeft: 15,
     flexDirection: "row",
     alignSelf: "stretch",
-    backgroundColor: "green"
+    backgroundColor: "green",
+    alignItems: "center",
+    justifyContent: "center"
   }
 });
 
