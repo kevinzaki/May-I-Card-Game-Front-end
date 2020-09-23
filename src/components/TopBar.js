@@ -8,7 +8,7 @@ import {
   Modal,
   TouchableHighlight
 } from "react-native";
-import Scores from "./Scores";
+import ScoresModal from "./ScoresModal";
 import Rules from "./Rules";
 import io from "socket.io-client";
 import socket from "../../util/socketConnection";
@@ -55,14 +55,15 @@ function TopBar() {
       <View style={styles.rules}>
         <Text style={styles.textColor}>{timer}</Text>
       </View>
-      <Scores></Scores>
+      <ScoresModal></ScoresModal>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    justifyContent: "space-around",
+    justifyContent: "center",
+    alignItems: "center",
     flexDirection: "row",
     paddingHorizontal: 30,
     paddingTop: 50,

@@ -13,6 +13,12 @@ const RoomProvider = props => {
   const [timer, setTimer] = useState(0);
   const [usersBuying, setUsersBuying] = useState([]);
   const [round, setRound] = useState("1");
+  const [intermission, setIntermission] = useState(false);
+  const [scores, setScores] = useState([
+    { id: "2323", name: "Kevin Zaki", points: 30 },
+    { id: "2324", name: "Danny", points: 404 }
+  ]);
+  const [winner, setWinner] = useState(null);
 
   useEffect(() => {
     const random = Math.random()
@@ -40,7 +46,13 @@ const RoomProvider = props => {
         startTurn,
         setStartTurn: val => setStartTurn(val),
         round,
-        setRound: round => setRound(round)
+        setRound: round => setRound(round),
+        intermission,
+        setIntermission: val => setIntermission(val),
+        scores,
+        setScores: scores => setScores(scores),
+        winner,
+        setWinner: user => setWinner(user)
       }}
     >
       {props.children}

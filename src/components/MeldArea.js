@@ -1,10 +1,11 @@
 import React, { useContext, useEffect } from "react";
-import { View, StyleSheet, Button } from "react-native";
+import { View, StyleSheet, Button, TouchableOpacity, Text } from "react-native";
 import { MeldsContext } from "../contexts/MeldsContext";
 import { DimensionsContext } from "../contexts/DimensionsContext";
 import { RoomContext } from "../contexts/RoomContext";
 import Meld from "./Meld";
 import MeldCard from "./MeldCard";
+import { LinearGradient } from "expo-linear-gradient";
 import socket from "../../util/socketConnection";
 
 function MeldArea(props) {
@@ -51,34 +52,36 @@ function MeldArea(props) {
         style={styles.buttonContainer}
         onLayout={e => setMeldButtonAreaHeight(e.nativeEvent.layout.height)}
       >
-        <View style={styles.button}>
-          <Button
-            onPress={() => {
-              if (user === turn) {
-                setMeldButton(true);
-                setMeldToDisplay(0);
-              } else {
-                alert("In must be your turn in order to meld.");
-              }
-            }}
-            title="MELD"
-          />
-        </View>
-        <View style={styles.button}>
-          <Button
-            onPress={() => {
-              setCreateMeld(meldToDisplay, null);
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => {
+            if (user === turn) {
+              setMeldButton(true);
               setMeldToDisplay(0);
-            }}
-            title="CLEAR"
-          />
-        </View>
-        <View style={styles.button}>
-          <Button
-            onPress={() => setMeldToDisplay(meldToDisplay === 0 ? 1 : 0)}
-            title={meldToDisplay === 0 ? "Next" : "Prev"}
-          />
-        </View>
+            } else {
+              alert("In must be your turn in order to meld.");
+            }
+          }}
+        >
+          <Text style={styles.buttonText}>MELD</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => {
+            setCreateMeld(meldToDisplay, null);
+            setMeldToDisplay(0);
+          }}
+        >
+          <Text style={styles.buttonText}>CLEAR</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => setMeldToDisplay(meldToDisplay === 0 ? 1 : 0)}
+        >
+          <Text style={styles.buttonText}>
+            {meldToDisplay === 0 ? "NEXT" : "PREV"}
+          </Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -93,12 +96,27 @@ const styles = StyleSheet.create({
     alignItems: "stretch"
   },
   buttonContainer: {
+    marginTop: -1,
     flexDirection: "row",
+    backgroundColor: "#00872f",
     alignItems: "stretch",
     alignItems: "stretch"
   },
   button: {
-    flex: 1
+    borderWidth: 1,
+    borderColor: "#007027",
+    flex: 1,
+    paddingVertical: 10,
+    alignContent: "center",
+    justifyContent: "center"
+  },
+  buttonText: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 11,
+    letterSpacing: 1.1,
+    alignSelf: "center",
+    justifyContent: "center"
   },
   meldsArea: {
     flex: 5,
@@ -110,11 +128,12 @@ const styles = StyleSheet.create({
     alignItems: "flex-start"
   },
   meldDropZone: {
+    borderWidth: 1,
+    borderColor: "#007027",
     flex: 1,
     paddingLeft: 15,
     flexDirection: "row",
     alignSelf: "stretch",
-    backgroundColor: "green",
     alignItems: "center",
     justifyContent: "center"
   }

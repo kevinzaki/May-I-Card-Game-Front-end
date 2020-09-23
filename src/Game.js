@@ -1,9 +1,19 @@
 import React, { useState, useEffect, useContext } from "react";
-import { StyleSheet, View } from "react-native";
+import {
+  StyleSheet,
+  View,
+  Alert,
+  Modal,
+  Text,
+  TouchableHighlight,
+  ActivityIndicator
+} from "react-native";
+import Snackbar from "react-native-snackbar";
 import socket from "../util/socketConnection";
 import TopBar from "./components/TopBar";
 import BottomBar from "./components/BottomBar";
 import GameBoard from "./components/GameBoard";
+import Intermission from "./components/Intermission";
 import MyCardsProvider from "./contexts/MyCardsContext";
 import MeldsProvider from "./contexts/MeldsContext";
 import DimensionsProvider from "./contexts/DimensionsContext";
@@ -17,6 +27,10 @@ import { RoomContext } from "./contexts/RoomContext";
  *
  */
 function Game(props) {
+  const [modalVisible, setModalVisible] = useState(true);
+  // const [intermissionModalVisible, setIntermissionModalVisible] = useState(
+  //   true
+  // );
   const [myPlayer, setMyPlayer] = useState({});
   const [buys, setBuys] = useState("6");
   const {
@@ -30,8 +44,16 @@ function Game(props) {
     startTurn,
     setBuyCard,
     round,
-    setRound
+    setRound,
+    intermission,
+    setIntermission,
+    setWinner,
+    setScores
   } = useContext(RoomContext);
+
+  // useEffect(() => {
+  //   if (modalVisible) setTimeout(() => setModalVisible(false), 4000);
+  // }, [modalVisible]);
 
   useEffect(() => {
     // attempt to join desired room
@@ -46,6 +68,7 @@ function Game(props) {
     // send a response to start game
     // server will send a series of emits with game data
     socket.on("gameReady", data => {
+      setModalVisible(false);
       socket.emit("startRound", { room, user });
     });
 
@@ -63,6 +86,7 @@ function Game(props) {
     // each game event is timed
     // use time event to manage the amount of time a user has to complete actions
     socket.on("timedEvent", ({ timer, event }) => {
+      //if (event === "ROUND") setIntermission(true);
       if (event === "BUY") setBuyInProgress(true);
       if (event === "TURN") setStartTurn(true);
       // set timer
@@ -93,18 +117,19 @@ function Game(props) {
 
     // upon round completetion
     socket.on("roundFinished", winner => {
-      alert(winner + " won the round!");
-
-      socket.emit("isGameOver", { room }, function(res) {
-        if (res) {
-          console.log("GAME IS OVER");
-          // game is over
-        } else {
-          console.log("ROUND IS OVER");
-          // continue to next round
-          socket.emit("startRound", { room, user });
-        }
-      });
+      //alert(winner + " won the round!");
+      //setIntermission(true);
+      // socket.emit("isGameOver", { room }, function(res) {
+      //   if (res) {
+      //     console.log("GAME IS OVER");
+      //     // game is over
+      //   } else {
+      //     console.log("ROUND IS OVER");
+      //     // continue to next round
+      //     //setIntermission(true);
+      //     socket.emit("startRound", { room, user });
+      //   }
+      // });
     });
 
     socket.on("updateOpponentCards", () => {
@@ -116,6 +141,23 @@ function Game(props) {
       socket.emit("getMelds", { room });
     });
 
+    socket.on("roundFinished", user => {
+      setTimer("L");
+      setWinner(user);
+      setIntermission(true);
+    });
+
+    socket.on("scores", data => {
+      setScores(data);
+    });
+
+    socket.on("snackBar", msg => {
+      Snackbar.dismiss();
+      Snackbar.show({
+        text: msg,
+        duration: Snackbar.LENGTH_SHORT
+      });
+    });
     //return () => socket.disconnect();
   }, [room]);
 
@@ -138,6 +180,19 @@ function Game(props) {
 
   return (
     <View style={styles.container}>
+      <Modal transparent={true} visible={modalVisible}>
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <ActivityIndicator size="large" color="#fff" />
+            <Text style={styles.modalText}>
+              Please be patient while we wait for other players.
+            </Text>
+          </View>
+        </View>
+      </Modal>
+      <Modal animationType="slide" transparent={true} visible={intermission}>
+        <Intermission />
+      </Modal>
       <DimensionsProvider>
         <MyCardsProvider>
           <MeldsProvider>
@@ -154,6 +209,30 @@ function Game(props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1
+  },
+  centeredView: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.85)",
+    justifyContent: "center",
+    alignItems: "center"
+  },
+  modalView: {},
+  openButton: {
+    backgroundColor: "#F194FF",
+    borderRadius: 20,
+    padding: 10,
+    elevation: 2
+  },
+  textStyle: {
+    color: "white",
+    fontWeight: "bold",
+    textAlign: "center"
+  },
+  modalText: {
+    padding: 20,
+    color: "white",
+    fontWeight: "bold",
+    textAlign: "center"
   }
 });
 

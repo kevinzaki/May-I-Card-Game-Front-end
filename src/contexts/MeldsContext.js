@@ -33,7 +33,7 @@ const MeldsProvider = props => {
       socket.emit("hasMeld", { room, user }, function(res) {
         // if true check if meld is swapable
         if (res) {
-          socket.emit("canSwapWithMeld", { room, user, meldDropID }, function(
+          socket.emit("canSwapWithMeld", { room, user, meldDropID, card: dropCard }, function(
             res
           ) {
             if (res) {
