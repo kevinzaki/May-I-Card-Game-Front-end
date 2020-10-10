@@ -33,48 +33,50 @@ const MeldsProvider = props => {
       socket.emit("hasMeld", { room, user }, function(res) {
         // if true check if meld is swapable
         if (res) {
-          socket.emit("canSwapWithMeld", { room, user, meldDropID, card: dropCard }, function(
-            res
-          ) {
-            if (res) {
-              Alert.alert(
-                "SWAP OR DISCARD",
-                "Would you like to pick up the wildcard 2?",
-                [
-                  {
-                    text: "Yes, swap!",
-                    onPress: () => {
-                      socket.emit("swapWithMeld", {
-                        room,
-                        user,
-                        meldDropID,
-                        card: dropCard
-                      });
+          socket.emit(
+            "canSwapWithMeld",
+            { room, user, meldDropID, card: dropCard },
+            function(res) {
+              if (res) {
+                Alert.alert(
+                  "SWAP OR DISCARD",
+                  "Would you like to pick up the wildcard 2?",
+                  [
+                    {
+                      text: "Yes, swap!",
+                      onPress: () => {
+                        socket.emit("swapWithMeld", {
+                          room,
+                          user,
+                          meldDropID,
+                          card: dropCard
+                        });
+                      }
+                    },
+                    {
+                      text: "No, just discard!",
+                      onPress: () => {
+                        socket.emit("addToMeld", {
+                          room,
+                          user,
+                          meldDropID,
+                          card: dropCard
+                        });
+                      }
                     }
-                  },
-                  {
-                    text: "No, just discard!",
-                    onPress: () => {
-                      socket.emit("addToMeld", {
-                        room,
-                        user,
-                        meldDropID,
-                        card: dropCard
-                      });
-                    }
-                  }
-                ],
-                { cancelable: false }
-              );
-            } else {
-              socket.emit("addToMeld", {
-                room,
-                user,
-                meldDropID,
-                card: dropCard
-              });
+                  ],
+                  { cancelable: false }
+                );
+              } else {
+                socket.emit("addToMeld", {
+                  room,
+                  user,
+                  meldDropID,
+                  card: dropCard
+                });
+              }
             }
-          });
+          );
         } else {
           alert("You Must have you meld before swapping with melds");
         }
@@ -94,11 +96,11 @@ const MeldsProvider = props => {
     // then take appropriate action
   }, [dropCard]);
 
-  useEffect(() => {
-    socket.on("melds", allMelds => {
-      setMelds(allMelds);
-    });
-  });
+  // useEffect(() => {
+  //   socket.on("melds", allMelds => {
+  //     setMelds(allMelds);
+  //   });
+  // });
 
   useEffect(() => {
     socket.on("melds", data => {

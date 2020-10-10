@@ -12,12 +12,14 @@ function BottomBar(props) {
   return (
     <View style={styles.container}>
       <View style={styles.rules}>
-        <Text style={styles.textColor}>Buys: {props.buys}</Text>
+        <Text style={styles.textColor}>
+          <Text style={{ color: "#a5f9c6" }}>BUYS:</Text> {props.buys}
+        </Text>
       </View>
       <View style={styles.rules}>
         <Text style={styles.textColor}>
-          {" "}
-          Meld: {meldName ? meldName["name"] : "Loading..."}
+          <Text style={{ color: "#a5f9c6" }}>MELD:</Text>{" "}
+          {meldName ? meldName["name"].toUpperCase() : "Loading..."}
         </Text>
       </View>
     </View>
@@ -29,14 +31,17 @@ const styles = StyleSheet.create({
     justifyContent: "space-around",
     flexDirection: "row",
     padding: 20,
-    backgroundColor: "#212121"
+    backgroundColor: "#191919"
   },
   rules: {
-    padding: 20
+    paddingTop: 10,
+    paddingBottom: 15
   },
   textColor: {
     color: "white",
-    fontWeight: "bold"
+    fontWeight: "bold",
+    fontFamily: "HelveticaNeue-CondensedBold",
+    fontSize: 20
   }
 });
 

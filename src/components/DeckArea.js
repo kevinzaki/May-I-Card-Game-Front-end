@@ -17,7 +17,7 @@ function DeckArea() {
       setDeckCount(data["count"]);
       setDiscardedCards(data["discarded"]);
     });
-    return () => socket.disconnect();
+    //return () => socket.disconnect();
   }, []);
 
   return (

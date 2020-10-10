@@ -21,7 +21,7 @@ const MyCardsProvider = props => {
       setMyCards([...myCards].filter(card => card.id !== discardCard.id));
       socket.emit("discardCard", { room, user, card: discardCard });
       setDiscardCard();
-      setTimer("L");
+      setTimer(0); // L
     }
   }, [discardCard]);
 

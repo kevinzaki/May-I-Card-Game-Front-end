@@ -56,7 +56,13 @@ function Card(props) {
           //   )(evt, gestureState);
         },
         onPanResponderRelease: (evt, gesture) => {
-          if (turn === user && !buyInProgress) {
+          console.log(user, turn, buyInProgress);
+          if (
+            turn === user &&
+            !buyInProgress &&
+            !disabledCards[props.id] &&
+            dropCard.id === null
+          ) {
             const { moveY, moveX } = gesture;
             for (let zone in meldsSwapArea) {
               if (isInDropZone(meldsSwapArea[zone], moveX, moveY)) {
@@ -116,6 +122,10 @@ function Card(props) {
     ]
   );
 
+  useEffect(() => {
+    if (!createMeld[0].length && !createMeld[0].length) setDull(null);
+  }, [createMeld]);
+
   const cardStyle =
     props.suit === "Hearts" || props.suit === "Diamonds"
       ? disabledCards[props.id]
@@ -141,6 +151,7 @@ function Card(props) {
     <Animated.View
       {...panResponder.panHandlers}
       style={[
+        { marginLeft: props.margin },
         cardTouchMargin,
         styles.container,
         cardSize,
@@ -148,7 +159,14 @@ function Card(props) {
         dull
       ]}
     >
-      <Text style={cardStyle}>{props.rank}</Text>
+      <Text
+        style={[
+          cardStyle,
+          { fontWeight: "bold", fontFamily: "HelveticaNeue-CondensedBold" }
+        ]}
+      >
+        {props.rank}
+      </Text>
       <Text style={cardStyle}>{symbol}</Text>
     </Animated.View>
   );
@@ -159,14 +177,22 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(165,165,165,1)"
   },
   container: {
+    elevation: 10,
     flex: 10,
     flexDirection: "column",
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "white",
     borderRadius: 5,
-    borderWidth: 1,
-    borderColor: "#00a33a"
+    borderWidth: 0.5,
+    borderColor: "#999",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: -2
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 2
   },
   large: {
     height: 127,
@@ -177,8 +203,8 @@ const styles = StyleSheet.create({
   regular: {
     height: 85,
     minWidth: 50,
-    maxWidth: 50,
-    marginLeft: -25
+    maxWidth: 50
+    // marginLeft: -25
   },
   blackCard: {
     marginLeft: -25,

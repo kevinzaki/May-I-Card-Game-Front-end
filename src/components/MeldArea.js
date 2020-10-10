@@ -1,5 +1,12 @@
 import React, { useContext, useEffect } from "react";
-import { View, StyleSheet, Button, TouchableOpacity, Text } from "react-native";
+import {
+  View,
+  StyleSheet,
+  Button,
+  TouchableOpacity,
+  Text,
+  ScrollView
+} from "react-native";
 import { MeldsContext } from "../contexts/MeldsContext";
 import { DimensionsContext } from "../contexts/DimensionsContext";
 import { RoomContext } from "../contexts/RoomContext";
@@ -22,7 +29,8 @@ function MeldArea(props) {
   const {
     setMeldAreaSize,
     setMeldContainerHeight,
-    setMeldButtonAreaHeight
+    setMeldButtonAreaHeight,
+    setScrolledInSwapArea
   } = useContext(DimensionsContext);
 
   return (
@@ -30,11 +38,13 @@ function MeldArea(props) {
       style={styles.container}
       onLayout={e => setMeldContainerHeight(e.nativeEvent.layout.height)}
     >
-      <View style={styles.meldsArea}>
-        {melds.map(({ id, cards }) => (
-          <Meld key={id} id={id} cards={cards} />
-        ))}
-      </View>
+      <ScrollView onMomentumScrollEnd={() => setScrolledInSwapArea(true)}>
+        <View style={styles.meldsArea}>
+          {melds.map(({ id, cards }) => (
+            <Meld key={id} id={id} cards={cards} />
+          ))}
+        </View>
+      </ScrollView>
       <View
         onLayout={e =>
           setMeldAreaSize({
@@ -53,7 +63,7 @@ function MeldArea(props) {
         onLayout={e => setMeldButtonAreaHeight(e.nativeEvent.layout.height)}
       >
         <TouchableOpacity
-          style={styles.button}
+          style={[styles.button, { marginRight: 10 }]}
           onPress={() => {
             if (user === turn) {
               setMeldButton(true);
@@ -66,7 +76,7 @@ function MeldArea(props) {
           <Text style={styles.buttonText}>MELD</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={styles.button}
+          style={[styles.button, { marginRight: 10 }]}
           onPress={() => {
             setCreateMeld(meldToDisplay, null);
             setMeldToDisplay(0);
@@ -96,25 +106,32 @@ const styles = StyleSheet.create({
     alignItems: "stretch"
   },
   buttonContainer: {
-    marginTop: -1,
+    paddingTop: 10,
     flexDirection: "row",
-    backgroundColor: "#00872f",
     alignItems: "stretch",
     alignItems: "stretch"
   },
   button: {
-    borderWidth: 1,
-    borderColor: "#007027",
     flex: 1,
+    backgroundColor: "#00802c",
+    borderRadius: 5,
     paddingVertical: 10,
+    paddingHorizontal: 15,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 1
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 1.01,
     alignContent: "center",
     justifyContent: "center"
   },
   buttonText: {
-    color: "#fff",
+    color: "white",
     fontWeight: "bold",
-    fontSize: 11,
-    letterSpacing: 1.1,
+    fontFamily: "HelveticaNeue-CondensedBold",
+    fontSize: 16,
     alignSelf: "center",
     justifyContent: "center"
   },
@@ -128,14 +145,24 @@ const styles = StyleSheet.create({
     alignItems: "flex-start"
   },
   meldDropZone: {
-    borderWidth: 1,
-    borderColor: "#007027",
+    minHeight: 60,
+    maxHeight: 60,
+    paddingVertical: 5,
+    backgroundColor: "#00802c",
     flex: 1,
+    borderRadius: 5,
     paddingLeft: 15,
     flexDirection: "row",
     alignSelf: "stretch",
     alignItems: "center",
-    justifyContent: "center"
+    justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 1
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 1.01
   }
 });
 

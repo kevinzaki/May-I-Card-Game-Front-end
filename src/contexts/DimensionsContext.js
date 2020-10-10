@@ -34,6 +34,7 @@ const DimensionsProvider = props => {
     height: 0,
     width: 0
   });
+  const [scrolledInSwapArea, setScrolledInSwapArea] = useState(false);
 
   useEffect(() => {
     setMeldDimensions({});
@@ -86,6 +87,7 @@ const DimensionsProvider = props => {
   }, [newMeldDropArea, discardAreaSize, deckAreaSize]);
 
   useEffect(() => {
+    setScrolledInSwapArea(false);
     const swapArea = {};
     for (let id in meldDimensions) {
       let xOffset = newMeldDropArea.x[0];
@@ -98,7 +100,12 @@ const DimensionsProvider = props => {
       };
     }
     setMeldsSwapArea(swapArea);
-  }, [meldDimensions, newMeldDropArea, meldAreaHeightOffset]);
+  }, [
+    meldDimensions,
+    newMeldDropArea,
+    meldAreaHeightOffset,
+    scrolledInSwapArea
+  ]);
 
   function meldDimensionsHelper(id, dimensions) {
     setMeldDimensions(prevState => {
@@ -130,7 +137,8 @@ const DimensionsProvider = props => {
         setMeldDimensions: (id, dimensions) =>
           meldDimensionsHelper(id, dimensions),
         meldDimensions,
-        setDeckAreaSize: size => setDeckAreaSize(size)
+        setDeckAreaSize: size => setDeckAreaSize(size),
+        setScrolledInSwapArea: val => setScrolledInSwapArea(val)
       }}
     >
       {props.children}

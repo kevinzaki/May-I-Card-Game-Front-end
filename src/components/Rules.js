@@ -96,13 +96,26 @@ const styles = StyleSheet.create({
     elevation: 5
   },
   openButton: {
+    width: 100,
     alignSelf: "flex-start",
-    padding: 10
+    backgroundColor: "#1f1f1f",
+    borderRadius: 5,
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 1
+    },
+    shadowOpacity: 0.4,
+    shadowRadius: 1.81
   },
   textColor: {
-    alignSelf: "flex-start",
+    alignSelf: "center",
     color: "white",
-    fontWeight: "bold"
+    fontWeight: "bold",
+    fontFamily: "HelveticaNeue-CondensedBold",
+    fontSize: 18
   },
   modalText: {
     textAlign: "center"

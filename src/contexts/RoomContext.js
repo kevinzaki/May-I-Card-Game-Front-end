@@ -5,6 +5,8 @@ export const RoomContext = createContext();
 
 const RoomProvider = props => {
   const [room, setRoom] = useState();
+  const [userName, setUserName] = useState();
+  const [numberOfPlayers, setNumberOfPlayers] = useState();
   const [turn, setTurn] = useState();
   const [user, setUser] = useState();
   const [startTurn, setStartTurn] = useState(false);
@@ -14,10 +16,7 @@ const RoomProvider = props => {
   const [usersBuying, setUsersBuying] = useState([]);
   const [round, setRound] = useState("1");
   const [intermission, setIntermission] = useState(false);
-  const [scores, setScores] = useState([
-    { id: "2323", name: "Kevin Zaki", points: 30 },
-    { id: "2324", name: "Danny", points: 404 }
-  ]);
+  const [scores, setScores] = useState([]);
   const [winner, setWinner] = useState(null);
 
   useEffect(() => {
@@ -52,7 +51,11 @@ const RoomProvider = props => {
         scores,
         setScores: scores => setScores(scores),
         winner,
-        setWinner: user => setWinner(user)
+        setWinner: user => setWinner(user),
+        numberOfPlayers,
+        setNumberOfPlayers: num => setNumberOfPlayers(num),
+        userName,
+        setUserName: name => setUserName(name)
       }}
     >
       {props.children}

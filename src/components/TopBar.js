@@ -33,16 +33,18 @@ function TopBar() {
     let timeCount;
     //if (timer === "L") clearTimeout(settimer);
     if (timer > 0) timeCount = setTimeout(() => setTimer(timer - 1), 1000);
-    else if (timer === 0 && buyInProgress) {
-      socket.emit("buyCard", { room, user, buyCard });
-      setTimer("L");
-    } else if (timer === 0 && startTurn && turn === user && !discardCard) {
-      let { id, rank, suit, order, value } = myCards[
-        Math.floor(Math.random() * myCards.length)
-      ];
-      setDiscardCard({ id, rank, suit, order, value });
-    } else if (timer === "L" || timer === 0) {
-      setTimer(<ActivityIndicator size="small" color="#00a33a" />);
+    // else if (timer === 0 && buyInProgress) {
+    //   socket.emit("buyCard", { room, user, buyCard });
+    //   setTimer("L");
+    // }
+    // else if (timer === 0 && startTurn && turn === user && !discardCard) {
+    //   let { id, rank, suit, order, value } = myCards[
+    //     Math.floor(Math.random() * myCards.length)
+    //   ];
+    //   setDiscardCard({ id, rank, suit, order, value });
+    // }
+    else if (timer === 0) {
+      setTimer(<ActivityIndicator size="small" color="#1f1f1f" />);
     }
     return () => {
       clearTimeout(timeCount);
@@ -67,13 +69,21 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     paddingHorizontal: 30,
     paddingTop: 50,
-    paddingBottom: 20,
-    backgroundColor: "#212121"
+    paddingBottom: 20
   },
   rules: {},
   textColor: {
     color: "white",
-    fontWeight: "bold"
+    fontWeight: "bold",
+    fontFamily: "HelveticaNeue-CondensedBold",
+    fontSize: 18,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 1
+    },
+    shadowOpacity: 0.4,
+    shadowRadius: 1.81
   }
 });
 

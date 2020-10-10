@@ -25,15 +25,15 @@ function DeckCard(props) {
 
   function _onLongPressButton() {
     if (buyInProgress) {
-      setBuyCard(true);
+      socket.emit("buyCard", { room, user });
     }
   }
 
-  useEffect(() => {
-    if (usersBuying.length === 3) {
-      socket.emit("startBuyProcess", { room, usersBuying });
-    }
-  }, [usersBuying]);
+  // useEffect(() => {
+  //   if (usersBuying.length === 3) {
+  //     socket.emit("startBuyProcess", { room, usersBuying });
+  //   }
+  // }, [usersBuying]);
 
   const cardStyle =
     props.suit === "Hearts" || props.suit === "Diamonds"
@@ -46,7 +46,14 @@ function DeckCard(props) {
         onLayout={e => setDiscardAreaSize(e.nativeEvent.layout)}
         style={styles.container}
       >
-        <Text style={cardStyle}>{props.rank}</Text>
+        <Text
+          style={[
+            cardStyle,
+            { fontWeight: "bold", fontFamily: "HelveticaNeue-CondensedBold" }
+          ]}
+        >
+          {props.rank}
+        </Text>
         <Text style={cardStyle}>{symbol}</Text>
       </View>
     </TouchableHighlight>
@@ -61,12 +68,17 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "white",
     borderRadius: 5,
-    borderWidth: 1,
-    borderColor: "#00a33a",
     height: 127,
     minWidth: 75,
     maxWidth: 75,
-    margin: 5
+    margin: 5,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 1
+    },
+    shadowOpacity: 0.4,
+    shadowRadius: 1.4
   },
   blackCard: {
     fontSize: 30,

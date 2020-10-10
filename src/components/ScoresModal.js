@@ -28,10 +28,18 @@ function ScoresModal() {
 
             <TouchableHighlight
               style={{
-                paddingVertical: 10,
-                paddingHorizontal: 20,
-                backgroundColor: "#00a33a",
-                fontWeight: "bold"
+                borderRadius: 10,
+                paddingVertical: 15,
+                paddingHorizontal: 40,
+                backgroundColor: "#212121",
+                fontWeight: "bold",
+                shadowColor: "#000",
+                shadowOffset: {
+                  width: 1,
+                  height: 1
+                },
+                shadowOpacity: 0.5,
+                shadowRadius: 5.41
               }}
               onPress={() => {
                 setModalVisible(!modalVisible);
@@ -39,6 +47,8 @@ function ScoresModal() {
             >
               <Text
                 style={{
+                  fontFamily: "HelveticaNeue-CondensedBold",
+                  fontSize: 18,
                   fontWeight: "bold",
                   color: "#fff"
                 }}
@@ -65,12 +75,9 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center"
-    // backgroundColor: "rgba(0,0,0,0.5)"
   },
   modalView: {
-    backgroundColor: "white",
     borderRadius: 20,
-    padding: 35,
     alignItems: "center",
     shadowColor: "#000",
     shadowOffset: {
@@ -82,12 +89,26 @@ const styles = StyleSheet.create({
     elevation: 5
   },
   openButton: {
+    width: 100,
     alignSelf: "flex-end",
-    padding: 10
+    backgroundColor: "#1f1f1f",
+    borderRadius: 5,
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 1
+    },
+    shadowOpacity: 0.4,
+    shadowRadius: 1.81
   },
   textColor: {
+    alignSelf: "center",
     color: "white",
-    fontWeight: "bold"
+    fontWeight: "bold",
+    fontFamily: "HelveticaNeue-CondensedBold",
+    fontSize: 18
   },
   modalText: {
     textAlign: "center"
