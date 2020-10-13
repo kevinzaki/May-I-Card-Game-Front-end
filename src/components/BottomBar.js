@@ -1,25 +1,29 @@
-import React, { useState, useEffect } from "react";
-import { StyleSheet, Text, Button, View } from "react-native";
+import React, { useContext } from "react";
+import { StyleSheet, Text, View } from "react-native";
 import { melds } from "../melds";
+import { RoomContext } from "../contexts/RoomContext";
 
+/**
+ *
+ * BottomBar Component
+ * Renders and manages all activity related to the bottom bar on
+ * the game view.
+ *
+ */
 function BottomBar(props) {
-  const [meldName, setMeldName] = useState(false);
-
-  useEffect(() => {
-    setMeldName(melds[props["round"] - 1]);
-  });
+  const { round } = useContext(RoomContext);
+  const roundText = melds[round - 1].name.toUpperCase();
 
   return (
     <View style={styles.container}>
       <View style={styles.rules}>
         <Text style={styles.textColor}>
-          <Text style={{ color: "#a5f9c6" }}>BUYS:</Text> {props.buys}
+          <Text style={styles.title}>BUYS:</Text> {props.buys}
         </Text>
       </View>
       <View style={styles.rules}>
         <Text style={styles.textColor}>
-          <Text style={{ color: "#a5f9c6" }}>MELD:</Text>{" "}
-          {meldName ? meldName["name"].toUpperCase() : "Loading..."}
+          <Text style={styles.title}>MELD:</Text> {roundText}
         </Text>
       </View>
     </View>
@@ -32,6 +36,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     padding: 20,
     backgroundColor: "#191919"
+  },
+  title: {
+    color: "#a5f9c6"
   },
   rules: {
     paddingTop: 10,

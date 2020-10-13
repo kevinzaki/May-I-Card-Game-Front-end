@@ -1,14 +1,25 @@
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, StyleSheet } from "react-native";
 
-function CardBack(props) {
-  const cardOrientation =
-    props.orientation === "vertical"
-      ? styles.verticalBackCard
-      : styles.horizontalBackCard;
-  return <View style={[styles.container, cardOrientation]}></View>;
+/**
+ * CardBack
+ * Component for generic back of card.
+ * @param {String} param0 - vertical or horizontal position
+ */
+function CardBack({ orientation }) {
+  return (
+    <View
+      style={[
+        styles.container,
+        orientation === "vertical"
+          ? styles.verticalBackCard
+          : styles.horizontalBackCard
+      ]}
+    ></View>
+  );
 }
 
+/** styling for CardBack Component */
 const styles = StyleSheet.create({
   container: {
     flexDirection: "column",
@@ -16,7 +27,6 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     backgroundColor: "#a5f9c6",
     borderRadius: 5
-    // transform: [{ rotate: "90deg" }]
   },
   horizontalBackCard: {
     minWidth: 50,

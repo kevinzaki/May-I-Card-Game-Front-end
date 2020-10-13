@@ -1,34 +1,19 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useContext } from "react";
 import { StyleSheet, Text, View } from "react-native";
-import socket from "../../util/socketConnection";
 import { RoomContext } from "../contexts/RoomContext";
 
+/**
+ * ScoresTable
+ * Gets game scores from RoomContext and generates a table of scores.
+ */
 function ScoresTable() {
   const { user, scores } = useContext(RoomContext);
 
   return (
     <View style={tableStyle.table}>
-      {/* <Text style={tableStyle.title}>SCOREBOARD</Text>
-      <View style={tableStyle.line} /> */}
       <View style={tableStyle.titleHeaderRow}>
         <View style={{ flex: 1 }}>
-          <Text
-            style={{
-              color: "#fff",
-              fontSize: 22,
-              textAlign: "center",
-              fontFamily: "HelveticaNeue-CondensedBold",
-              shadowColor: "#000",
-              shadowOffset: {
-                width: 0,
-                height: 1
-              },
-              shadowOpacity: 0.2,
-              shadowRadius: 1.41
-            }}
-          >
-            SCORECARD
-          </Text>
+          <Text style={tableStyle.title}>SCORECARD</Text>
         </View>
       </View>
       <View style={tableStyle.headerRow}>
@@ -49,10 +34,8 @@ function ScoresTable() {
             <View style={{ flex: 3 }}>
               <Text
                 style={[
-                  user === item.id ? tableStyle.txtBold : null,
-                  {
-                    fontFamily: "HelveticaNeue"
-                  }
+                  user === item.id && tableStyle.txtBold,
+                  tableStyle.tableFont
                 ]}
               >
                 {idx + 1}
@@ -61,11 +44,8 @@ function ScoresTable() {
             <View style={{ flex: 6 }}>
               <Text
                 style={[
-                  {
-                    textTransform: "uppercase",
-                    fontFamily: "HelveticaNeue"
-                  },
-                  user === item.id ? tableStyle.txtBold : null
+                  user === item.id && tableStyle.txtBold,
+                  tableStyle.tableFont
                 ]}
               >
                 {item.name}
@@ -75,8 +55,8 @@ function ScoresTable() {
               <Text
                 style={[
                   tableStyle.dataText,
-                  user === item.id ? tableStyle.txtBold : null,
-                  { fontFamily: "HelveticaNeue" }
+                  tableStyle.tableFont,
+                  user === item.id && tableStyle.txtBold
                 ]}
               >
                 {item.points}
@@ -87,6 +67,8 @@ function ScoresTable() {
     </View>
   );
 }
+
+/** Styling for ScoresTable Component */
 const tableStyle = StyleSheet.create({
   table: {
     width: 275,
@@ -105,6 +87,9 @@ const tableStyle = StyleSheet.create({
     },
     shadowOpacity: 0.5,
     shadowRadius: 5.41
+  },
+  tableFont: {
+    fontFamily: "HelveticaNeue"
   },
   row: {
     backgroundColor: "#fff",
@@ -145,13 +130,18 @@ const tableStyle = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 0.5
   },
-  dataText: {
-    textAlign: "center"
-  },
   title: {
-    fontWeight: "bold",
-    letterSpacing: 2,
-    fontSize: 18
+    color: "#fff",
+    fontSize: 22,
+    textAlign: "center",
+    fontFamily: "HelveticaNeue-CondensedBold",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 1
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 1.41
   },
   line: {
     marginTop: 10,

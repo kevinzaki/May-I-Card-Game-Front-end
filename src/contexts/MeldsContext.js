@@ -5,14 +5,27 @@ import { RoomContext } from "./RoomContext";
 
 export const MeldsContext = createContext();
 
+/**
+ * MeldsContext
+ * Stores and manages data for all melds related data.  Manages cards currently
+ * being used to create a meld.  Manages all active melds. Manages dropping and swapping
+ * with a meld card.
+ */
 const MeldsProvider = props => {
   const { room, user, round } = useContext(RoomContext);
-
+  // All current melds
   const [melds, setMelds] = useState([]);
+  // Melds currently being created
   const [createMeld, setCreateMeld] = useState([[], []]);
+  // Current meld to display in the create a meld area
   const [meldToDisplay, setMeldToDisplay] = useState(0);
+  // Meld button state
   const [meldButton, setMeldButton] = useState(false);
+  // All cards from hand currently being used to meld or discard
   const [disabledCards, setDisabledCards] = useState({});
+  // ID of meld a user is trying to swap / drop a card on
+  const [meldDropID, setMeldDropID] = useState();
+  // Current card from a user Hand they are attempting to drop on a meld
   const [dropCard, setDropCard] = useState({
     id: null,
     rank: null,
@@ -20,13 +33,13 @@ const MeldsProvider = props => {
     order: null,
     value: null
   });
-  const [meldDropID, setMeldDropID] = useState();
-  const [swapButton, setSwapButton] = useState(false);
 
+  /** Reset disabled cards on new rounds */
   useEffect(() => {
     setDisabledCards({});
   }, [round]);
 
+  /** Handles dropping or swapping a card onto an existing meld */
   useEffect(() => {
     if (meldDropID >= 0 && dropCard.id >= 0) {
       // check if user has meld
@@ -37,6 +50,7 @@ const MeldsProvider = props => {
             "canSwapWithMeld",
             { room, user, meldDropID, card: dropCard },
             function(res) {
+              // If swappable ask if player wants to swap or discard
               if (res) {
                 Alert.alert(
                   "SWAP OR DISCARD",
@@ -68,6 +82,7 @@ const MeldsProvider = props => {
                   { cancelable: false }
                 );
               } else {
+                // if not swappable just attempt add to meld
                 socket.emit("addToMeld", {
                   room,
                   user,
@@ -80,6 +95,7 @@ const MeldsProvider = props => {
         } else {
           alert("You Must have you meld before swapping with melds");
         }
+        // reset meld drop ID and drop card
         setMeldDropID();
         setDropCard({
           id: null,
@@ -90,27 +106,18 @@ const MeldsProvider = props => {
         });
       });
     }
-    // see if we can swap with meld
-    // if there is a duce ask user if they want to pick the duce up
-    // or just drop their card down
-    // then take appropriate action
   }, [dropCard]);
 
-  // useEffect(() => {
-  //   socket.on("melds", allMelds => {
-  //     setMelds(allMelds);
-  //   });
-  // });
-
+  /** Receive meld data */
   useEffect(() => {
     socket.on("melds", data => {
       setMelds(data);
     });
   }, []);
 
+  /** Handles creating a new meld */
   useEffect(() => {
     if (meldButton) {
-      console.log(createMeld);
       setMeldButton(false);
       let newMelds = [];
       if (createMeld[0].length) newMelds.push(createMeld[0]);
@@ -136,6 +143,12 @@ const MeldsProvider = props => {
     }
   }, [meldButton]);
 
+  /**
+   * createNewMeld
+   * Helper method to setting state for create Meld.
+   * @param {Number} id
+   * @param {Object} card
+   */
   function createNewMeld(id, card) {
     let newMelds = [[...createMeld[0]], [...createMeld[1]]];
     if (card) newMelds[id].push(card);
@@ -146,6 +159,11 @@ const MeldsProvider = props => {
     setCreateMeld(newMelds);
   }
 
+  /**
+   * addToDisabledCards
+   * Adds a card to disabled cards
+   * @param {number} id
+   */
   function addToDisabledCards(id) {
     setDisabledCards({ ...disabledCards, [id]: true });
   }
@@ -154,18 +172,18 @@ const MeldsProvider = props => {
     <MeldsContext.Provider
       value={{
         melds,
-        setMelds: newMeld => setMelds([...Melds, newMeld]),
-        setCreateMeld: (id, card) => createNewMeld(id, card),
         createMeld,
         meldToDisplay,
-        setMeldToDisplay: value => setMeldToDisplay(value),
         meldButton,
-        setMeldButton: value => setMeldButton(value),
         disabledCards,
+        dropCard,
+        setMelds: newMeld => setMelds([...Melds, newMeld]),
+        setCreateMeld: (id, card) => createNewMeld(id, card),
+        setMeldToDisplay: value => setMeldToDisplay(value),
+        setMeldButton: value => setMeldButton(value),
         setDisabledCards: cardID => addToDisabledCards(cardID),
         setDropCard: card => setDropCard(card),
-        setMeldDropID: id => setMeldDropID(id),
-        dropCard
+        setMeldDropID: id => setMeldDropID(id)
       }}
     >
       {props.children}

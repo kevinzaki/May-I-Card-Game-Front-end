@@ -6,6 +6,13 @@ import { MyCardsContext } from "../contexts/MyCardsContext";
 import { RoomContext } from "../contexts/RoomContext";
 import cardSymbols from "../../util/cardSymbols";
 
+/**
+ *
+ * Card Component
+ * Renders and manages all activity related a card in a players hand including
+ * drag and drop functionality.
+ *
+ */
 function Card(props) {
   const { turn, user, buyInProgress } = useContext(RoomContext);
   const { setDiscardCard } = useContext(MyCardsContext);
@@ -19,10 +26,21 @@ function Card(props) {
     setDropCard,
     dropCard
   } = useContext(MeldsContext);
+
   const { newMeldDropArea, meldsSwapArea, discardCardArea } = useContext(
     DimensionsContext
   );
 
+  /**
+   *
+   * isInDropZone
+   * Checks if a provided x and y are in a provided zone.
+   *
+   * @param {Object} zone - Coordinates / range to check against
+   * @param {Number} x - horizontal start and end point
+   * @param {Number} y - vertical start and end point
+   * @return {boolean}
+   */
   function isInDropZone(zone, x, y) {
     const [xStart, xEnd] = zone.x;
     const [yStart, yEnd] = zone.y;
@@ -30,81 +48,91 @@ function Card(props) {
     return false;
   }
 
+  /**
+   *
+   * between
+   * Checks if a provided x value is between a provided min and max value.
+   *
+   * @param {Number} x
+   * @param {Number} min
+   * @param {Number} max
+   */
   function between(x, min, max) {
     return x >= min && x <= max;
   }
 
-  const pan = useRef(new Animated.ValueXY()).current;
+  const pan = useRef(new Animated.ValueXY())
+    .current; /** references current position */
+
+  /**
+   * panResponder to handle touch events
+   * Also utilize useMemo to subscribe to updates from events that changes the card
+   */
   const panResponder = React.useMemo(
     () =>
       PanResponder.create({
+        /** allow the gesture if conditions are met */
         onStartShouldSetPanResponder: (evt, gesture) => {
-          return true;
-        },
-        onPanResponderMove: (evt, gesture) => {
-          pan.x.setValue(gesture.dx);
-          pan.y.setValue(gesture.dy);
-          //   Animated.event(
-          //     [
-          //       null,
-          //       {
-          //         dx: pan.x, // x,y are Animated.Value
-          //         dy: pan.y
-          //       }
-          //     ],
-          //     { useNativeDriver: false }
-          //   )(evt, gestureState);
-        },
-        onPanResponderRelease: (evt, gesture) => {
-          console.log(user, turn, buyInProgress);
           if (
             turn === user &&
             !buyInProgress &&
             !disabledCards[props.id] &&
             dropCard.id === null
           ) {
-            const { moveY, moveX } = gesture;
-            for (let zone in meldsSwapArea) {
-              if (isInDropZone(meldsSwapArea[zone], moveX, moveY)) {
-                //setDisabledCards(props.id);
-                setDropCard({
-                  id: props.id,
-                  rank: props.rank,
-                  suit: props.suit,
-                  order: props.order,
-                  value: props.value
-                });
-                setMeldDropID(zone);
-              }
-            }
-            if (isInDropZone(newMeldDropArea, moveX, moveY)) {
-              setDisabledCards(props.id);
-              pan.x.setValue(0);
-              pan.y.setValue(0);
-              setCreateMeld(meldToDisplay, {
+            return true;
+          }
+          return false;
+        },
+        /** sets current position of the card based on touch gesture */
+        onPanResponderMove: (evt, gesture) => {
+          pan.x.setValue(gesture.dx);
+          pan.y.setValue(gesture.dy);
+        },
+        /**
+         * onPanResponderRelease
+         * On the gesture release check that the user has permission to move the card
+         * then check the drop location of the card to determine which game action to take.
+         */
+        onPanResponderRelease: (evt, gesture) => {
+          const { moveY, moveX } = gesture;
+          for (let zone in meldsSwapArea) {
+            /** card is dropped on top of a meld to swap or discard */
+            if (isInDropZone(meldsSwapArea[zone], moveX, moveY)) {
+              setDropCard({
                 id: props.id,
                 rank: props.rank,
                 suit: props.suit,
                 order: props.order,
                 value: props.value
               });
-            } else if (isInDropZone(discardCardArea, moveX, moveY)) {
-              setDiscardCard({
-                id: props.id,
-                rank: props.rank,
-                suit: props.suit,
-                order: props.order,
-                value: props.value
-              });
-            } else {
-              Animated.spring(
-                pan, // Auto-multiplexed
-                { toValue: { x: 0, y: 0 }, useNativeDriver: false } // Back to zero
-              ).start();
+              setMeldDropID(zone);
             }
+          }
+          /** card is dropped on top of meld area to use in creating a new meld */
+          if (isInDropZone(newMeldDropArea, moveX, moveY)) {
+            setDisabledCards(props.id);
+            pan.x.setValue(0);
+            pan.y.setValue(0);
+            setCreateMeld(meldToDisplay, {
+              id: props.id,
+              rank: props.rank,
+              suit: props.suit,
+              order: props.order,
+              value: props.value
+            });
+            /** card is dropped into the discard pile */
+          } else if (isInDropZone(discardCardArea, moveX, moveY)) {
+            setDiscardCard({
+              id: props.id,
+              rank: props.rank,
+              suit: props.suit,
+              order: props.order,
+              value: props.value
+            });
+            /** card is released elsewhere, animate back to original position */
           } else {
             Animated.spring(
-              pan, // Auto-multiplexed
+              pan,
               { toValue: { x: 0, y: 0 }, useNativeDriver: false } // Back to zero
             ).start();
           }
@@ -122,61 +150,64 @@ function Card(props) {
     ]
   );
 
+  /** manages whether the card is being used */
+  const [dull, setDull] = useState(false);
+
+  /** clears dull cards when meld area is cleared */
   useEffect(() => {
-    if (!createMeld[0].length && !createMeld[0].length) setDull(null);
+    if (createMeld[0].length + createMeld[1].length === 0) setDull(false);
   }, [createMeld]);
 
-  const cardStyle =
-    props.suit === "Hearts" || props.suit === "Diamonds"
-      ? disabledCards[props.id]
-        ? styles.dullRedCard
-        : styles.redCard
-      : disabledCards[props.id]
-      ? styles.dullBlackCard
-      : styles.blackCard;
-  const cardSize = props.size === "large" ? styles.large : styles.regular;
-  const symbol = String.fromCharCode(cardSymbols[props.suit]);
-  const cardTouchMargin = disabledCards[props.id]
-    ? styles.marginTop
-    : styles.noMarginTop;
-  const [dull, setDull] = useState(null);
-
+  /** sets a card to dull */
   useEffect(() => {
-    if (disabledCards[props.id] || dropCard.id === props.id)
-      setDull(styles.dull);
-    else setDull(null);
+    if (disabledCards[props.id] || dropCard.id === props.id) setDull(true);
+    else setDull(false);
   }, [disabledCards, dropCard]);
+
+  /** sets card style to red or black or dull */
+  const cardStyle = () => {
+    if (props.suit === "Hearts" || props.suit === "Diamonds") {
+      if (dull) return styles.dullRedCard;
+      else return styles.redCard;
+    } else {
+      if (dull) return styles.dullBlackCard;
+      else return styles.blackCard;
+    }
+  };
+
+  /** Get card suit symbol */
+  const symbol = String.fromCharCode(cardSymbols[props.suit]);
 
   return (
     <Animated.View
       {...panResponder.panHandlers}
       style={[
         { marginLeft: props.margin },
-        cardTouchMargin,
         styles.container,
-        cardSize,
         pan.getLayout(),
-        dull
+        dull ? styles.dull : {}
       ]}
     >
-      <Text
-        style={[
-          cardStyle,
-          { fontWeight: "bold", fontFamily: "HelveticaNeue-CondensedBold" }
-        ]}
-      >
-        {props.rank}
-      </Text>
-      <Text style={cardStyle}>{symbol}</Text>
+      <Text style={[cardStyle(), styles.cardTxtStyle]}>{props.rank}</Text>
+      <Text style={cardStyle()}>{symbol}</Text>
     </Animated.View>
   );
 }
 
+/** all card styling */
 const styles = StyleSheet.create({
+  cardTxtStyle: {
+    marginLeft: -25,
+    fontWeight: "bold",
+    fontFamily: "HelveticaNeue-CondensedBold"
+  },
   dull: {
     backgroundColor: "rgba(165,165,165,1)"
   },
   container: {
+    height: 85,
+    minWidth: 50,
+    maxWidth: 50,
     elevation: 10,
     flex: 10,
     flexDirection: "column",
@@ -194,18 +225,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 2
   },
-  large: {
-    height: 127,
-    minWidth: 75,
-    maxWidth: 75,
-    margin: 5
-  },
-  regular: {
-    height: 85,
-    minWidth: 50,
-    maxWidth: 50
-    // marginLeft: -25
-  },
   blackCard: {
     marginLeft: -25,
     color: "black"
@@ -221,12 +240,6 @@ const styles = StyleSheet.create({
   dullRedCard: {
     marginLeft: -25,
     color: "#ff5c5c"
-  },
-  marginTop: {
-    marginBottom: 0
-  },
-  noMarginTop: {
-    marginTop: 0
   }
 });
 

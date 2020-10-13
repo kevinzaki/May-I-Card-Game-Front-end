@@ -2,32 +2,39 @@ import React from "react";
 import { View, StyleSheet, Text } from "react-native";
 import cardSymbols from "../../util/cardSymbols";
 
+/**
+ *
+ * MeldCard
+ * A card component that is rendered in the meld area to represent one
+ * card in a meld.
+ *
+ */
 function MeldCard(props) {
   const { suit } = props;
+  /** Determine card style based on suit */
   const cardStyle =
     suit === "Hearts" || suit === "Diamonds"
       ? styles.redCard
       : styles.blackCard;
+  /** Get card symbol */
   const symbol = String.fromCharCode(cardSymbols[suit]);
 
   return (
     <View style={styles.container}>
-      <Text
-        style={[
-          cardStyle,
-          { fontWeight: "bold", fontFamily: "HelveticaNeue-CondensedBold" }
-        ]}
-      >
-        {props.rank}
-      </Text>
+      <Text style={[cardStyle, styles.cardText]}>{props.rank}</Text>
       <Text style={cardStyle}>{symbol}</Text>
     </View>
   );
 }
 
+/** Styling for MeldCard Component */
 const styles = StyleSheet.create({
   dull: {
     backgroundColor: "rgba(165,165,165,1)"
+  },
+  cardText: {
+    fontWeight: "bold",
+    fontFamily: "HelveticaNeue-CondensedBold"
   },
   container: {
     flex: 10,

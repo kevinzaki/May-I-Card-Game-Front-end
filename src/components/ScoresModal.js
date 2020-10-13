@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
-  Alert,
   Modal,
   StyleSheet,
   Text,
@@ -9,52 +8,26 @@ import {
 } from "react-native";
 import ScoresTable from "./ScoresTable";
 
+/**
+ * ScoresModal
+ * Button that when clicked renders a Modal that displays game scores.
+ */
 function ScoresModal() {
   const [modalVisible, setModalVisible] = useState(false);
 
   return (
     <View style={styles.centeredView}>
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => {
-          Alert.alert("Modal has been closed.");
-        }}
-      >
+      <Modal animationType="slide" transparent={true} visible={modalVisible}>
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
             <ScoresTable />
-
             <TouchableHighlight
-              style={{
-                borderRadius: 10,
-                paddingVertical: 15,
-                paddingHorizontal: 40,
-                backgroundColor: "#212121",
-                fontWeight: "bold",
-                shadowColor: "#000",
-                shadowOffset: {
-                  width: 1,
-                  height: 1
-                },
-                shadowOpacity: 0.5,
-                shadowRadius: 5.41
-              }}
+              style={styles.ButtonStyle}
               onPress={() => {
                 setModalVisible(!modalVisible);
               }}
             >
-              <Text
-                style={{
-                  fontFamily: "HelveticaNeue-CondensedBold",
-                  fontSize: 18,
-                  fontWeight: "bold",
-                  color: "#fff"
-                }}
-              >
-                CLOSE
-              </Text>
+              <Text style={styles.btnTxt}>CLOSE</Text>
             </TouchableHighlight>
           </View>
         </View>
@@ -70,6 +43,8 @@ function ScoresModal() {
     </View>
   );
 }
+
+/** Styling for ScoresModal */
 const styles = StyleSheet.create({
   centeredView: {
     flex: 1,
@@ -112,6 +87,26 @@ const styles = StyleSheet.create({
   },
   modalText: {
     textAlign: "center"
+  },
+  ButtonStyle: {
+    borderRadius: 10,
+    paddingVertical: 15,
+    paddingHorizontal: 40,
+    backgroundColor: "#212121",
+    fontWeight: "bold",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 1,
+      height: 1
+    },
+    shadowOpacity: 0.5,
+    shadowRadius: 5.41
+  },
+  btnTxt: {
+    fontFamily: "HelveticaNeue-CondensedBold",
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#fff"
   }
 });
 

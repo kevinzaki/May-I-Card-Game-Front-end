@@ -7,11 +7,19 @@ import DeckArea from "./DeckArea";
 import MeldArea from "./MeldArea";
 import { DimensionsContext } from "../contexts/DimensionsContext";
 
+/**
+ * GameBoard
+ * Component manages the entire actionable game board.
+ */
 function GameBoard() {
   const [opponents, setOponnents] = useState([]);
   const { setMeldAreaHeightOffset } = useContext(DimensionsContext);
 
   useEffect(() => {
+    /**
+     * getOtherPlayers
+     * Sets opponent data on message from server.
+     */
     socket.on("getOtherPlayers", data => {
       setOponnents(data);
     });
@@ -21,6 +29,7 @@ function GameBoard() {
     <>
       <View
         onLayout={e => {
+          /** sets offset of top bar for use in dimensions context */
           setMeldAreaHeightOffset(e.nativeEvent.layout.y);
         }}
         style={styles.container}
@@ -39,6 +48,7 @@ function GameBoard() {
   );
 }
 
+/** Styling for GameBoard component */
 const styles = StyleSheet.create({
   meldContainer: {
     flex: 1

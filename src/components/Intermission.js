@@ -1,33 +1,33 @@
 import React, { useState, useEffect, useContext } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  TouchableHighlight
-} from "react-native";
+import { View, Text, StyleSheet, TouchableHighlight } from "react-native";
 import ScoresTable from "./ScoresTable";
 import socket from "../../util/socketConnection";
 import { RoomContext } from "../contexts/RoomContext";
 import ConfettiCannon from "react-native-confetti-cannon";
 
+/**
+ *
+ * Intermission
+ * Component that is called inside a modal to handle intermissions between game rounds.
+ *
+ */
 function Intermission({ navigation }) {
-  const {
-    setIntermission,
-    intermission,
-    round,
-    winner,
-    room,
-    user,
-    scores
-  } = useContext(RoomContext);
+  const { setIntermission, round, winner, room, user, scores } = useContext(
+    RoomContext
+  );
 
+  /** Timer / length of time left of intermission */
   const [intermissionTimer, setIntermissionTimer] = useState(null);
 
+  /** sets intermission timer to 20 seconds when component mounts */
   useEffect(() => {
     if (round < 6) setIntermissionTimer(20);
   }, []);
 
+  /**
+   * Manages set timer / the ticking of the timer. When timer hits 0 emit startRound and close
+   * intermission modal by setting intermission to false.
+   */
   useEffect(() => {
     if (intermissionTimer > 0)
       setTimeout(() => setIntermissionTimer(intermissionTimer - 1), 1000);
@@ -37,6 +37,10 @@ function Intermission({ navigation }) {
     }
   }, [intermissionTimer]);
 
+  /**
+   * Uses navigation prop to navigate back to the homescreen on user click
+   * at the end of each game.
+   */
   function handleLeaveRoom() {
     socket.emit("leaveRoom", { room, user });
     navigation.goBack();
@@ -83,6 +87,7 @@ function Intermission({ navigation }) {
   );
 }
 
+/** Intermission Component Styling */
 const styles = StyleSheet.create({
   centeredView: {
     flex: 1,

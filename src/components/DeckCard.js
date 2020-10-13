@@ -1,9 +1,10 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext } from "react";
 import { StyleSheet, View, Text, TouchableHighlight } from "react-native";
 import { DimensionsContext } from "../contexts/DimensionsContext";
 import { RoomContext } from "../contexts/RoomContext";
 import socket from "../../util/socketConnection";
 
+/** char codes for suit symbols */
 const cardSymbols = {
   Clubs: 9827,
   Diamonds: 9830,
@@ -11,55 +12,51 @@ const cardSymbols = {
   Spades: 9824
 };
 
-function DeckCard(props) {
+/**
+ * DeckCard
+ * Component that handles the large discarded deck card.
+ * @param {Object} suit - card suit
+ * @param {Object} rank - card rank
+ */
+function DeckCard({ suit, rank }) {
   const { setDiscardAreaSize } = useContext(DimensionsContext);
-  const {
-    room,
-    user,
-    buyCard,
-    setBuyCard,
-    setUsersBuying,
-    usersBuying,
-    buyInProgress
-  } = useContext(RoomContext);
+  const { room, user, buyInProgress } = useContext(RoomContext);
 
-  function _onLongPressButton() {
+  /** sets styling for card */
+  const cardStyle =
+    suit === "Hearts" || suit === "Diamonds"
+      ? styles.redCard
+      : styles.blackCard;
+
+  /** card suit symbol */
+  const symbol = String.fromCharCode(cardSymbols[suit]);
+
+  /**
+   * onLongPressButton
+   * Handles a user attempting to buy a card.  User must long press the discarded card
+   * area while the buying process is active.
+   */
+  function onLongPressButton() {
     if (buyInProgress) {
       socket.emit("buyCard", { room, user });
     }
   }
 
-  // useEffect(() => {
-  //   if (usersBuying.length === 3) {
-  //     socket.emit("startBuyProcess", { room, usersBuying });
-  //   }
-  // }, [usersBuying]);
-
-  const cardStyle =
-    props.suit === "Hearts" || props.suit === "Diamonds"
-      ? styles.redCard
-      : styles.blackCard;
-  const symbol = String.fromCharCode(cardSymbols[props.suit]);
   return (
-    <TouchableHighlight onLongPress={_onLongPressButton} underlayColor="green">
+    <TouchableHighlight onLongPress={onLongPressButton} underlayColor="green">
       <View
+        /** store the dimentions of deck card area in dimensions context */
         onLayout={e => setDiscardAreaSize(e.nativeEvent.layout)}
         style={styles.container}
       >
-        <Text
-          style={[
-            cardStyle,
-            { fontWeight: "bold", fontFamily: "HelveticaNeue-CondensedBold" }
-          ]}
-        >
-          {props.rank}
-        </Text>
+        <Text style={[cardStyle, styles.cardTxtStyle]}>{rank}</Text>
         <Text style={cardStyle}>{symbol}</Text>
       </View>
     </TouchableHighlight>
   );
 }
 
+/** Styling for DeckCard Component */
 const styles = StyleSheet.create({
   container: {
     flexDirection: "column",
@@ -87,6 +84,10 @@ const styles = StyleSheet.create({
   redCard: {
     fontSize: 30,
     color: "red"
+  },
+  cardTxtStyle: {
+    fontWeight: "bold",
+    fontFamily: "HelveticaNeue-CondensedBold"
   }
 });
 

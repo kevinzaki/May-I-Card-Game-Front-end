@@ -4,21 +4,34 @@ import socket from "../../util/socketConnection";
 export const RoomContext = createContext();
 
 const RoomProvider = props => {
+  // Room ID
   const [room, setRoom] = useState();
+  // User Name
   const [userName, setUserName] = useState();
+  // Number of Game players allowed
   const [numberOfPlayers, setNumberOfPlayers] = useState();
+  // Current turn ID
   const [turn, setTurn] = useState();
+  // User profile
   const [user, setUser] = useState();
+  // Start a users turn
   const [startTurn, setStartTurn] = useState(false);
+  // Buy a card
   const [buyCard, setBuyCard] = useState(false);
+  // Buying procedure in progress
   const [buyInProgress, setBuyInProgress] = useState(false);
+  // Game action timer
   const [timer, setTimer] = useState(0);
-  const [usersBuying, setUsersBuying] = useState([]);
+  // Current game round
   const [round, setRound] = useState("1");
+  // is currently in intermission
   const [intermission, setIntermission] = useState(false);
+  // Game scores
   const [scores, setScores] = useState([]);
+  // Winner of game
   const [winner, setWinner] = useState(null);
 
+  /** Generate user ID */
   useEffect(() => {
     const random = Math.random()
       .toString(36)
@@ -30,31 +43,29 @@ const RoomProvider = props => {
     <RoomContext.Provider
       value={{
         room,
-        setRoom: room => setRoom(room),
+        buyCard,
+        timer,
         user,
         turn,
-        setTurn: id => setTurn(id),
-        buyCard,
-        setBuyCard: val => setBuyCard(val),
-        timer,
-        setTimer: time => setTimer(time),
         buyInProgress,
-        setBuyInProgress: val => setBuyInProgress(val),
-        usersBuying,
-        setUsersBuying: users => setUsersBuying(users),
         startTurn,
-        setStartTurn: val => setStartTurn(val),
         round,
-        setRound: round => setRound(round),
         intermission,
-        setIntermission: val => setIntermission(val),
         scores,
-        setScores: scores => setScores(scores),
         winner,
-        setWinner: user => setWinner(user),
         numberOfPlayers,
-        setNumberOfPlayers: num => setNumberOfPlayers(num),
         userName,
+        setTurn: id => setTurn(id),
+        setRoom: room => setRoom(room),
+        setBuyCard: val => setBuyCard(val),
+        setTimer: time => setTimer(time),
+        setBuyInProgress: val => setBuyInProgress(val),
+        setStartTurn: val => setStartTurn(val),
+        setRound: round => setRound(round),
+        setIntermission: val => setIntermission(val),
+        setScores: scores => setScores(scores),
+        setWinner: user => setWinner(user),
+        setNumberOfPlayers: num => setNumberOfPlayers(num),
         setUserName: name => setUserName(name)
       }}
     >

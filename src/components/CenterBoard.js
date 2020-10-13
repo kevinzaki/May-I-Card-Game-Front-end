@@ -1,8 +1,12 @@
 import React from "react";
-import { StyleSheet, View, Text } from "react-native";
+import { StyleSheet, View } from "react-native";
 import DeckArea from "./DeckArea";
 import MeldArea from "./MeldArea";
-import MyCards from "./MyCards";
+
+/**
+ * CenterBoard
+ * Container for all items components in the center of the board (meld and deck areas).
+ */
 function CenterBoard() {
   return (
     <View style={styles.container}>
@@ -12,6 +16,7 @@ function CenterBoard() {
   );
 }
 
+/** Styles form CenterBoard Component */
 const styles = StyleSheet.create({
   container: {
     flex: 8,

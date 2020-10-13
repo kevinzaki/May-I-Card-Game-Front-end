@@ -1,8 +1,7 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext } from "react";
 import {
   View,
   StyleSheet,
-  Button,
   TouchableOpacity,
   Text,
   ScrollView
@@ -12,10 +11,13 @@ import { DimensionsContext } from "../contexts/DimensionsContext";
 import { RoomContext } from "../contexts/RoomContext";
 import Meld from "./Meld";
 import MeldCard from "./MeldCard";
-import { LinearGradient } from "expo-linear-gradient";
-import socket from "../../util/socketConnection";
 
-function MeldArea(props) {
+/**
+ * MeldArea
+ * Component container for everything meld related. Includes rendering melds and
+ * rendering and managing the submission of new melds.
+ */
+function MeldArea() {
   const { turn, user } = useContext(RoomContext);
   const {
     melds,
@@ -38,6 +40,11 @@ function MeldArea(props) {
       style={styles.container}
       onLayout={e => setMeldContainerHeight(e.nativeEvent.layout.height)}
     >
+      {/**
+       * Scroll view is used when melds overflow container
+       * On every scroll setScrolledInSwapArea to true triggers rerendering
+       * of meld dimensions in order to accurately handle swap and drop events.
+       */}
       <ScrollView onMomentumScrollEnd={() => setScrolledInSwapArea(true)}>
         <View style={styles.meldsArea}>
           {melds.map(({ id, cards }) => (
@@ -45,6 +52,7 @@ function MeldArea(props) {
           ))}
         </View>
       </ScrollView>
+      {/** Display all melds */}
       <View
         onLayout={e =>
           setMeldAreaSize({
@@ -58,6 +66,7 @@ function MeldArea(props) {
           <MeldCard key={id} id={id} rank={rank} suit={suit} />
         ))}
       </View>
+      {/** Display and manage creation of new melds */}
       <View
         style={styles.buttonContainer}
         onLayout={e => setMeldButtonAreaHeight(e.nativeEvent.layout.height)}
@@ -99,6 +108,7 @@ function MeldArea(props) {
 
 export default MeldArea;
 
+/** Styling for MeldArea Component */
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -165,7 +175,3 @@ const styles = StyleSheet.create({
     shadowRadius: 1.01
   }
 });
-
-// !UkS@mj%3FmcH
-// !UkS@mj%3FmcH
-// !UkS@mj%3FmcH

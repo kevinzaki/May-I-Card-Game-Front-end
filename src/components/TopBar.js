@@ -1,51 +1,27 @@
-import React, { useState, useEffect, useContext, useRef } from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-  ActivityIndicator,
-  Alert,
-  Modal,
-  TouchableHighlight
-} from "react-native";
+import React, { useEffect, useContext } from "react";
+import { StyleSheet, Text, View, ActivityIndicator } from "react-native";
 import ScoresModal from "./ScoresModal";
 import Rules from "./Rules";
-import io from "socket.io-client";
-import socket from "../../util/socketConnection";
 import { RoomContext } from "../contexts/RoomContext";
-import { MyCardsContext } from "../contexts/MyCardsContext";
 
+/**
+ * TopBar
+ * Manages top bar layout and keeps track of the game clock.  The game clock is the amount
+ * of time the user has to make an action during their turn or when buying.
+ */
 function TopBar() {
-  const {
-    room,
-    user,
-    timer,
-    setTimer,
-    buyCard,
-    buyInProgress,
-    setUsersBuying,
-    startTurn,
-    turn
-  } = useContext(RoomContext);
+  const { timer, setTimer } = useContext(RoomContext);
 
-  const { setDiscardCard, discardCard, myCards } = useContext(MyCardsContext);
+  /** Manages game clock timer */
   useEffect(() => {
     let timeCount;
-    //if (timer === "L") clearTimeout(settimer);
+    /** If timer is greater than 0 tick 1 second and repeat */
+    /** If timer is equal to 0 Set activity indicator until timer is set by server */
     if (timer > 0) timeCount = setTimeout(() => setTimer(timer - 1), 1000);
-    // else if (timer === 0 && buyInProgress) {
-    //   socket.emit("buyCard", { room, user, buyCard });
-    //   setTimer("L");
-    // }
-    // else if (timer === 0 && startTurn && turn === user && !discardCard) {
-    //   let { id, rank, suit, order, value } = myCards[
-    //     Math.floor(Math.random() * myCards.length)
-    //   ];
-    //   setDiscardCard({ id, rank, suit, order, value });
-    // }
     else if (timer === 0) {
       setTimer(<ActivityIndicator size="small" color="#1f1f1f" />);
     }
+    /** clear timer */
     return () => {
       clearTimeout(timeCount);
     };
@@ -62,6 +38,7 @@ function TopBar() {
   );
 }
 
+/** Stying for TopBar Component */
 const styles = StyleSheet.create({
   container: {
     justifyContent: "center",
@@ -71,7 +48,6 @@ const styles = StyleSheet.create({
     paddingTop: 50,
     paddingBottom: 20
   },
-  rules: {},
   textColor: {
     color: "white",
     fontWeight: "bold",
