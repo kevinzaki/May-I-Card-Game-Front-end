@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import { TextInput, Button } from "react-native-paper";
-import { NavigationContainer } from "@react-navigation/native";
+import { useIsFocused, NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import RoomProvider, { RoomContext } from "./src/contexts/RoomContext";
 import { DefaultTheme, Provider as PaperProvider } from "react-native-paper";
@@ -13,18 +13,13 @@ import Game from "./src/Game";
  * Component handles all functionality and UI related to joining and creating a game.
  */
 function HomeScreen({ navigation }) {
-  const { setRoom, setUserName, setNumberOfPlayers } = useContext(RoomContext);
+  const { room, setRoom, setUserName, setNumberOfPlayers } = useContext(
+    RoomContext
+  );
   const [numOfPlayers, setNumOfPlayers] = useState(3);
   const [roomText, setRoomText] = useState("");
   const [userText, setUserText] = useState("");
   const [createRoom, setCreateRoom] = useState(false);
-
-  /** resets all room data upon mounting */
-  useEffect(() => {
-    setRoom("");
-    setUserName("");
-    setNumOfPlayers(3);
-  }, []);
 
   /**
    * handleGameRoom
@@ -32,10 +27,16 @@ function HomeScreen({ navigation }) {
    * upon attempting to join or create a room.
    */
   function handleGameRoom() {
+    console.log(room);
     setRoom(roomText);
     setNumberOfPlayers(numOfPlayers);
     setUserName(userText);
-    navigation.navigate("GameCon", { createRoom });
+    navigation.navigate("GameCon", {
+      createRoom,
+      userText,
+      roomText,
+      numOfPlayers
+    });
   }
 
   return (
@@ -141,7 +142,7 @@ function HomeScreen({ navigation }) {
             style={homeScreen.roomButton}
             mode="contained"
             color="#212121"
-            onPress={handleGameRoom}
+            onPress={() => handleGameRoom()}
           >
             {createRoom ? "Create Room" : "Join Room"}
           </Button>

@@ -16,13 +16,16 @@ function GameBoard() {
   const { setMeldAreaHeightOffset } = useContext(DimensionsContext);
 
   useEffect(() => {
+    let mounted = true;
     /**
      * getOtherPlayers
      * Sets opponent data on message from server.
      */
     socket.on("getOtherPlayers", data => {
-      setOponnents(data);
+      if (mounted) setOponnents(data);
     });
+
+    return () => (mounted = false);
   }, []);
 
   return (

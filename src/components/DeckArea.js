@@ -19,15 +19,19 @@ function DeckArea() {
   });
 
   useEffect(() => {
+    let mounted = true;
     /**
      * deck
      * server emits a deck message whenever there are changes to the discarded card
      * or number of cards in the active deck.
      */
-    socket.on("deck", data => {
-      setDeckCount(data["count"]);
-      setDiscardedCards(data["discarded"]);
-    });
+    if (mounted) {
+      socket.on("deck", data => {
+        setDeckCount(data["count"]);
+        setDiscardedCards(data["discarded"]);
+      });
+    }
+    return () => (mounted = false);
   }, []);
 
   return (

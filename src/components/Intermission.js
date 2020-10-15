@@ -21,7 +21,9 @@ function Intermission({ navigation }) {
 
   /** sets intermission timer to 20 seconds when component mounts */
   useEffect(() => {
-    if (round < 6) setIntermissionTimer(20);
+    let mounted = true;
+    if (round < 6 && mounted) setIntermissionTimer(20);
+    return () => (mounted = false);
   }, []);
 
   /**
@@ -29,12 +31,14 @@ function Intermission({ navigation }) {
    * intermission modal by setting intermission to false.
    */
   useEffect(() => {
-    if (intermissionTimer > 0)
+    let mounted = true;
+    if (intermissionTimer > 0 && mounted)
       setTimeout(() => setIntermissionTimer(intermissionTimer - 1), 1000);
-    else if (intermissionTimer === 0) {
+    else if (intermissionTimer === 0 && mounted) {
       socket.emit("startRound", { room, user });
       setIntermission(false);
     }
+    return () => (mounted = false);
   }, [intermissionTimer]);
 
   /**
@@ -59,9 +63,7 @@ function Intermission({ navigation }) {
         {round < 6 && (
           <View>
             <Text style={styles.roundTxt}>Round {round} complete</Text>
-            <Text style={styles.intermissionTxt}>
-              {winner} has won the round!
-            </Text>
+            <Text style={styles.intermissionTxt}>{winner} won the round!</Text>
           </View>
         )}
         <ScoresTable />
@@ -178,6 +180,29 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.8,
     shadowRadius: 1.5
+  },
+  openButton: {
+    marginTop: 15,
+    width: 100,
+    alignSelf: "center",
+    backgroundColor: "#00a33a",
+    borderRadius: 5,
+    paddingVertical: 10,
+    paddingHorizontal: 5,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 1
+    },
+    shadowOpacity: 0.4,
+    shadowRadius: 1.81
+  },
+  textColor: {
+    alignSelf: "center",
+    color: "white",
+    fontWeight: "bold",
+    fontFamily: "HelveticaNeue-CondensedBold",
+    fontSize: 16
   }
 });
 export default Intermission;

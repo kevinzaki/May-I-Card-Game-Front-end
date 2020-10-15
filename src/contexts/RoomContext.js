@@ -5,9 +5,9 @@ export const RoomContext = createContext();
 
 const RoomProvider = props => {
   // Room ID
-  const [room, setRoom] = useState();
+  const [room, setRoom] = useState("");
   // User Name
-  const [userName, setUserName] = useState();
+  const [userName, setUserName] = useState("");
   // Number of Game players allowed
   const [numberOfPlayers, setNumberOfPlayers] = useState();
   // Current turn ID
@@ -56,7 +56,7 @@ const RoomProvider = props => {
         numberOfPlayers,
         userName,
         setTurn: id => setTurn(id),
-        setRoom: room => setRoom(room),
+        setRoom: id => setRoom(id),
         setBuyCard: val => setBuyCard(val),
         setTimer: time => setTimer(time),
         setBuyInProgress: val => setBuyInProgress(val),

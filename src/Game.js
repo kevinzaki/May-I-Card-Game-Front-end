@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
 import {
   StyleSheet,
   View,
@@ -18,7 +18,6 @@ import MyCardsProvider from "./contexts/MyCardsContext";
 import MeldsProvider from "./contexts/MeldsContext";
 import DimensionsProvider from "./contexts/DimensionsContext";
 import { RoomContext } from "./contexts/RoomContext";
-
 /**
  *
  * Game Component
@@ -26,6 +25,7 @@ import { RoomContext } from "./contexts/RoomContext";
  *
  */
 function Game({ navigation, createRoom }) {
+  const isMountedRef = useRef(null);
   const [modalVisible, setModalVisible] = useState(true);
   const [snackBar, setSnackBar] = useState(false);
   const [snackBarText, setSnackBarText] = useState(null);
@@ -34,6 +34,8 @@ function Game({ navigation, createRoom }) {
   const {
     room,
     user,
+    setRoom,
+    setUserName,
     userName,
     numberOfPlayers,
     turn,
@@ -52,8 +54,13 @@ function Game({ navigation, createRoom }) {
   } = useContext(RoomContext);
 
   useEffect(() => {
+    isMountedRef.current = true;
+
+    //const socket = io("http://192.168.1.2:3000");
+    console.log("Game " + room);
+    if (!socket.connected && isMountedRef.current) socket.connect();
     /** create or join room uses createRoom prop to determine which action to take */
-    if (room && user) {
+    if (room && user && isMountedRef.current) {
       if (createRoom) {
         socket.emit(
           "createRoom",
@@ -91,8 +98,10 @@ function Game({ navigation, createRoom }) {
      * server to reconnect to game.
      */
     socket.on("reconnectEstablished", () => {
-      setModalVisible(false);
-      socket.emit("reconnectToGame", { room, user });
+      if (isMountedRef.current) {
+        setModalVisible(false);
+        socket.emit("reconnectToGame", { room, user });
+      }
     });
 
     /**
@@ -101,8 +110,11 @@ function Game({ navigation, createRoom }) {
      * and message server to begin procedures to start round.
      */
     socket.on("gameReady", data => {
-      setModalVisible(false);
-      socket.emit("startRound", { room, user });
+      if (isMountedRef.current) {
+        setModalVisible(false);
+        console.log("Start Roun " + room);
+        socket.emit("startRound", { room, user });
+      }
     });
 
     /**
@@ -110,8 +122,10 @@ function Game({ navigation, createRoom }) {
      * Message from server containing all data relevant to ones own player.
      */
     socket.on("getMyPlayer", data => {
-      setMyPlayer(data);
-      setBuys(data.buys.toString());
+      if (isMountedRef.current) {
+        setMyPlayer(data);
+        setBuys(data.buys.toString());
+      }
     });
 
     /**
@@ -119,7 +133,7 @@ function Game({ navigation, createRoom }) {
      * Message from server containing the current round
      */
     socket.on("getCurrentRound", data => {
-      setRound(data);
+      if (isMountedRef.current) setRound(data);
     });
 
     /**
@@ -138,7 +152,7 @@ function Game({ navigation, createRoom }) {
      * Updated turn id
      */
     socket.on("setTurn", id => {
-      setTurn(id);
+      if (isMountedRef.current) setTurn(id);
     });
 
     /**
@@ -148,10 +162,12 @@ function Game({ navigation, createRoom }) {
      * required game updates after a buy.  Sets buyCard and BuyInProgress states to false.
      */
     socket.on("buyFinalized", () => {
-      socket.emit("updateAfterBuy", { room, user }, function(data) {
-        setBuyCard(false);
-        setBuyInProgress(false);
-      });
+      if (isMountedRef.current) {
+        socket.emit("updateAfterBuy", { room, user }, function(data) {
+          setBuyCard(false);
+          setBuyInProgress(false);
+        });
+      }
     });
 
     /**
@@ -160,7 +176,7 @@ function Game({ navigation, createRoom }) {
      * player data.
      */
     socket.on("userDrewACard", () => {
-      socket.emit("getOtherPlayers", { room, user });
+      if (isMountedRef.current) socket.emit("getOtherPlayers", { room, user });
     });
 
     /**
@@ -169,7 +185,7 @@ function Game({ navigation, createRoom }) {
      * action that occurred.
      */
     socket.on("updateOpponentCards", () => {
-      socket.emit("getOpponentCards", { room, user });
+      if (isMountedRef.current) socket.emit("getOpponentCards", { room, user });
     });
 
     /**
@@ -178,8 +194,8 @@ function Game({ navigation, createRoom }) {
      * other opponents cards and melds object.
      */
     socket.on("updateAfterMeldDropOrSwap", () => {
-      socket.emit("getOpponentCards", { room, user });
-      socket.emit("getMelds", { room });
+      if (isMountedRef.current) socket.emit("getOpponentCards", { room, user });
+      if (isMountedRef.current) socket.emit("getMelds", { room });
     });
 
     /**
@@ -188,9 +204,9 @@ function Game({ navigation, createRoom }) {
      * sets the winner of round sent by server, and begins intermission period
      */
     socket.on("roundFinished", user => {
-      setTimer(0); // L
-      setWinner(user);
-      setIntermission(true);
+      if (isMountedRef.current) setTimer(0); // L
+      if (isMountedRef.current) setWinner(user);
+      if (isMountedRef.current) setIntermission(true);
     });
 
     /**
@@ -198,13 +214,18 @@ function Game({ navigation, createRoom }) {
      * Updates scores data after a round has ended.
      */
     socket.on("scores", data => {
-      setScores(data);
+      if (isMountedRef.current) setScores(data);
     });
-  }, [room]);
+
+    return () => {
+      isMountedRef.current = false;
+      socket.disconnect();
+    };
+  }, []);
 
   /** Every turn update triggers a buyProcess */
   useEffect(() => {
-    if (turn !== undefined) {
+    if (turn !== undefined && isMountedRef.current) {
       socket.emit("buyProcess", { room, user });
     }
   }, [turn]);
@@ -217,40 +238,45 @@ function Game({ navigation, createRoom }) {
      * When there is a critical game action such as a change in TURN, BUY, or MELD
      * the server alerts us to display a snack bar alert.
      */
-    socket.on("snackBar", ({ userID, name, action }) => {
-      let message = action => {
-        let msg = "";
-        switch (action) {
-          case "TURN":
-            msg =
-              userID === user
-                ? "It is now your turn!"
-                : `It is ${name}'s turn.`;
-            break;
-          case "BUY":
-            msg =
-              userID === user ? "You bought a card." : `${name} bought a card.`;
-            break;
-          case "MELD":
-            msg =
-              userID === user
-                ? "You placed down a meld."
-                : `${name} placed down a meld.`;
-        }
-        return msg;
+    if (isMountedRef.current) {
+      socket.on("snackBar", ({ userID, name, action }) => {
+        let message = action => {
+          let msg = "";
+          switch (action) {
+            case "TURN":
+              msg =
+                userID === user
+                  ? "It is now your turn!"
+                  : `It is ${name}'s turn.`;
+              break;
+            case "BUY":
+              msg =
+                userID === user
+                  ? "You bought a card."
+                  : `${name} bought a card.`;
+              break;
+            case "MELD":
+              msg =
+                userID === user
+                  ? "You placed down a meld."
+                  : `${name} placed down a meld.`;
+          }
+          return msg;
+        };
+        setSnackBarText(message(action));
+        setSnackBar(true);
+        timer = setTimeout(() => setSnackBar(false), 3000);
+      });
+      return () => {
+        clearTimeout(timer);
       };
-      setSnackBarText(message(action));
-      setSnackBar(true);
-      timer = setTimeout(() => setSnackBar(false), 3000);
-    });
-    return () => {
-      clearTimeout(timer);
-    };
+    }
   }, []);
 
   /** Handles drawing card when it is the users turn */
   useEffect(() => {
-    if (startTurn && turn === user) socket.emit("drawCard", { room, user });
+    if (startTurn && turn === user && isMountedRef.current)
+      socket.emit("drawCard", { room, user });
   }, [startTurn]);
 
   /**
@@ -259,8 +285,14 @@ function Game({ navigation, createRoom }) {
    * This function alerts the server and navigates back to the home screen.
    */
   function handleLeaveRoom() {
-    socket.emit("leaveRoom", { room, user });
-    navigation.goBack();
+    if (isMountedRef.current) {
+      socket.emit("leaveRoom", { room, user }, function() {
+        setRoom("");
+        setUserName("");
+        socket.disconnect();
+        navigation.goBack();
+      });
+    }
   }
 
   return (

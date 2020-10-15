@@ -15,29 +15,27 @@ const MyCardsProvider = props => {
   /** Stores a card dropped into the discard pile */
   const [discardCard, setDiscardCard] = useState();
 
-  /** Updates player cards on server getMyPlayer emit */
   useEffect(() => {
+    let mounted = true;
+    /** Updates player cards on server getMyPlayer emit */
     socket.on("getMyPlayer", data => {
-      setMyCards(data["hand"]);
+      if (mounted) setMyCards(data["hand"]);
     });
-  }, []);
 
-  /** Emits a discardCard message to server when user drops card into the discard pile */
-  useEffect(() => {
-    if (discardCard) {
+    /** Upon successfully discarding a card server emits a message to end turn */
+    socket.on("discardCard", data => {
+      if (mounted) setStartTurn(false);
+    });
+
+    /** Emits a discardCard message to server when user drops card into the discard pile */
+    if (discardCard && mounted) {
       setMyCards([...myCards].filter(card => card.id !== discardCard.id));
       socket.emit("discardCard", { room, user, card: discardCard });
       setDiscardCard();
       setTimer(0);
     }
+    return () => (mounted = false);
   }, [discardCard]);
-
-  /** Upon successfully discarding a card server emits a message to end turn */
-  useEffect(() => {
-    socket.on("discardCard", data => {
-      setStartTurn(false);
-    });
-  });
 
   return (
     <MyCardsContext.Provider

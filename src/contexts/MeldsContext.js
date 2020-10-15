@@ -110,9 +110,13 @@ const MeldsProvider = props => {
 
   /** Receive meld data */
   useEffect(() => {
-    socket.on("melds", data => {
-      setMelds(data);
-    });
+    let mounted = true;
+    if (mounted) {
+      socket.on("melds", data => {
+        setMelds(data);
+      });
+    }
+    return () => (mounted = false);
   }, []);
 
   /** Handles creating a new meld */

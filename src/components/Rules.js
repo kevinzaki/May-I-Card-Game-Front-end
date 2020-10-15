@@ -83,19 +83,19 @@ function Rules() {
                   <Text style={styles.rulesDescription}>
                     A meld is a group or set of cards that all have the same
                     value. Each round has a unique meld requirement that needs
-                    to be met. For example round one has the meld requirement of
-                    - 2 THREE OF A KIND - which means two sets of three cards
+                    to be met. For example, round one has the meld requirement
+                    of - 2 THREE OF A KIND - which means two sets of three cards
                     that all have the same value. A wildcard (2) can be used in
-                    the place of any cards.
+                    the place of any card.
                   </Text>
                   {"\n"}
                   {"\n"}
                   <Text style={styles.rulesTitle}>MELDS</Text>
                   {"\n"}
                   <Text style={styles.rulesDescription}>
-                    1 - 2 Three of a Kind 2 - 1 Four of a Kind 3 - 2 Four of a
-                    Kind 4 - 1 Five of a Kind 5 - 1 Six of a Kind 6 - 2 Five of
-                    a Kind
+                    1 - 2 Three of a Kind{"\n"}2 - 1 Four of a Kind{"\n"}3 - 2
+                    Four of a Kind{"\n"}4 - 1 Five of a Kind{"\n"}5 - 1 Six of a
+                    Kind{"\n"}6 - 2 Five of a Kind
                   </Text>
                   {"\n"}
                   {"\n"}
@@ -114,13 +114,13 @@ function Rules() {
                   <Text style={styles.rulesDescription}>
                     Each player begins the game with 6 buys. At the start of
                     every turn each player will have the opportunity to buy the
-                    most recent discarded card. If multiple players request to
+                    most recently discarded card. If multiple players request to
                     buy a card the buyer is determined in order from active
                     player onwards in a clockwise motion. The player who
                     discarded the card cannot purchase the card. Upon a
                     successful purchase a player also draws an extra card from
-                    the deck. A player may buy as many cards as they have buys
-                    in any given round.
+                    the deck. A player may buy up to six times throughout the
+                    entire game.
                   </Text>
                   {"\n"}
                   {"\n"}
@@ -168,8 +168,8 @@ function Rules() {
                     If a player has a card that can replace a wildcard in an
                     active meld, while still maintaining the validity of that
                     meld, a player may swap their card for the wild card. The
-                    player cannot swap on their own melds. A player may also
-                    drop a card to any meld including their own that, when
+                    player cannot swap on a meld created by them. A player may
+                    also drop a card to any meld including their own that, when
                     dropped, maintains the validity of that meld. A player must
                     meet their meld requirements before swapping or dropping.
                   </Text>
