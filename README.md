@@ -1,6 +1,6 @@
 ## MayI? Card Game 
 
-May I is a multiplayer card game with similar rules to Rummy.  I am not exactly sure the origins of this version of the game but it is unlike anything I could find online.  The exact rule set used in this variation is the one I grew up with at family functions.  The games objective is for each player to group their cards together to satisfy the rounds melding requirements (a meld is a required number of groups/sets of cards, acheiving your meld allows you to get rid of the cards from your hand) in order to have the lowest total card value at the end of each round and ultimately the game.
+May I is a multiplayer card game with similar rules to Rummy.  I am not exactly sure the origins of this version of the game but it is unlike anything I could find online.  The exact rule set used in this variation is the one I grew up with at family functions.  The games objective is for each player to group their cards together to satisfy the rounds melding requirements (a meld is a required number of groups/sets of cards, achieving your meld allows you to get rid of the cards from your hand) in order to have the lowest total card value at the end of each round and ultimately the game.
 
 ## Project Status
 The project is still being developed. Built with react-native the game has been end-to-end tested on the latest versions of ios.  Users should be able to play through an entire game on ios with little to no issues.  However, there is much more testing and inevitably some bug fixes that will continue to be developed.
